@@ -14,6 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import dio.budgeting.application.SumTransactionsByCategoryUseCase;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -28,19 +29,22 @@ public class TransactionController {
     private final TranscriptionModel transcriptionModel;
     private final ChatClient chatClient;
     private final TextToSpeechModel textToSpeechModel;
+    private final SumTransactionsByCategoryUseCase sumTransactionsByCategoryUseCase;
 
     public TransactionController(PersistTransactionUseCase persistTransactionUseCase,
                                  ListTransactionsByCategoryUseCase listTransactionsByCategoryUseCase,
+                                 SumTransactionsByCategoryUseCase sumTransactionsByCategoryUseCase,
                                  TranscriptionModel transcriptionModel,
                                  @Value("classpath:prompts/system-message.st") Resource systemPrompt,
                                  ChatClient.Builder chatClientBuilder,
                                  TextToSpeechModel textToSpeechModel) throws IOException {
         this.persistTransactionUseCase = persistTransactionUseCase;
         this.listTransactionsByCategoryUseCase = listTransactionsByCategoryUseCase;
+        this.sumTransactionsByCategoryUseCase = sumTransactionsByCategoryUseCase;
         this.transcriptionModel = transcriptionModel;
         this.chatClient = chatClientBuilder
                 .defaultSystem(systemPrompt.getContentAsString(Charset.defaultCharset()))
-                .defaultTools(persistTransactionUseCase, listTransactionsByCategoryUseCase)
+                .defaultTools(persistTransactionUseCase, listTransactionsByCategoryUseCase, sumTransactionsByCategoryUseCase)
                 .build();
         this.textToSpeechModel = textToSpeechModel;
     }
